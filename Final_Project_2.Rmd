@@ -1,8 +1,7 @@
 ---
 title: "Data 621 Final Project"
-author: "(Group 4) Eddie Xu, Mohamed Hassan-El Serafi, Chun Shing Leung, Keith Colella, Yina,
-  Qiao"
-date: "2024-11-16"
+author: "(Group 4) Eddie Xu, Mohamed Hassan-El Serafi, Chun Shing Leung, Keith Colella, Yina Qiao"
+date: "`r Sys.Date()`"
 output: html_document
 ---
 
@@ -74,6 +73,8 @@ mydata.clean <- mydata %>%
 ```{r}
 str(mydata.clean)
 ```
+
+
 ```{r}
 # Statistical summary
 summary(mydata.clean)
@@ -85,7 +86,7 @@ summary(mydata.clean)
 ```{r, echo=FALSE}
 num_vars <- mydata.clean %>% select_if(where(is.numeric))
 vis_miss(num_vars, cluster = TRUE) + 
-  ggtitle("Numeric Variables \n- Most Missing Values (INCOME, HOME_VAL, AGE, YOJ, CAR_AGE)") +
+  ggtitle("Numeric Variables - Most Missing Values") +
   theme(
     plot.title = element_text(face = "bold"),
     plot.margin = unit(c(1, 2, 1, 1), "cm")
@@ -97,7 +98,7 @@ cat_vars <- mydata.clean %>% select_if(~ is.factor(.))
 cat_vars <- cat_vars %>% 
   mutate(across(everything(), ~na_if(as.character(.), "")))
 vis_miss(cat_vars, cluster = TRUE) +
-  ggtitle("Categorical Variables \n- Most Missing Values (JOB)") +
+  ggtitle("Categorical Variables - Most Missing Values") +
   theme(
     plot.title = element_text(face = "bold"),
     plot.margin = unit(c(1, 2, 1, 1), "cm")
@@ -313,6 +314,9 @@ set.seed(1235)
 rf2 <- randomForest(target ~ ., data=train, proximity=TRUE, importance =TRUE, ntree = 5)
 rf2
 ```
+
+
+
 ```{r}
 #Variable Importance - which variables can we remove?
 
@@ -333,6 +337,9 @@ rf3
 result <- data.frame(test$target, predict(rf3, test[, 0:13], type="response"))
 head(result)
 ```
+
+
+
 ```{r}
 confusionMatrix(result$predict.rf3..test...0.13...type....response.., result$test.target)
 ```
@@ -349,4 +356,11 @@ roc(mydata$target, logistic_2$fitted.values, plot=TRUE, legacy.axes=TRUE, percen
 plot.roc(train$target, rf3$votes[,1], percent=TRUE, col="#FA8072", print.auc=TRUE, add=TRUE, print.auc.y=40)
 legend("bottomright", legend=c("Logistic Regression", "Random Forest"), col=c("#0ABAB5","#FA8072"), lwd=2)
 ```
+
+
+
+
+
+
+
 

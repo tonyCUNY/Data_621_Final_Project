@@ -1,6 +1,6 @@
 ---
 title: "Data 621 Final Project"
-author: "Mohamed Hassan-El Serafi"
+author: "Mohamed Hassan-El Serafi, Chun Shing Leung, Eddie Xu, Keith Colella, Yina Qiao"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -12,5 +12,193 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 ```{r}
 library(tidyverse)
 library(caret)
+library(MASS)
+library(kableExtra)
+library(DataExplorer)
+library(skimr)
+library(psych)
+library(forcats)
+library(gridExtra)
+library(outliers)
+library(reactable)
 ```
+
+
+
+
+
+
+```{r}
+df <- read_csv("/Users/mohamedhassan/Downloads/heart.csv")
+```
+
+
+
+```{r}
+reactable(df)
+```
+
+
+```{r}
+glimpse(df)
+```
+
+
+```{r}
+df %>%
+  summary() %>%
+  kable() %>%
+  kable_styling()
+```
+
+
+```{r}
+skim(df)
+```
+
+
+
+
+```{r}
+df %>% 
+  gather(variable, value) %>%
+  filter(is.na(value)) %>%
+  group_by(variable) %>%
+  tally() %>%
+  mutate(percent = n / nrow(df) * 100) %>%
+  #mutate(percent = paste0(round(percent, ifelse(percent < 10, 1, 0)), "%")) %>%
+  arrange(desc(n)) %>%
+  rename(`Variable Missing Data` = variable,
+         `Number of Records` = n,
+         `Share of Total` = percent) %>%
+  kable(caption="<center>Missing Training Data Count and Percentage", align = "c") %>% 
+  kable_styling(latex_options="scale_down", c("striped", "hover", "condensed", full_width=F))
+```
+
+
+```{r data_explorer, warning=FALSE, message=FALSE}
+introduce(df)
+
+# par on plots
+par(mfrow = c(1, 4))
+plot_intro(df)
+describeBy(df)
+plot_histogram(df)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+# Boxplot
+df %>%
+  gather() %>%
+  ggplot(aes(value)) +
+  facet_wrap(~ key, scales = "free") +
+  geom_boxplot(fill = "pink") +
+  labs(title = "Box & Histogram Plots of Numeric Variables", x = "Value", y = "Frequency")
+
+
+
+ggplot(gather(df), aes(value)) +
+  facet_wrap(~ key, scales = "free") +
+  geom_histogram(bins = 30, fill = "lightblue", color = "black")
+```
+
+
+
+
+
+
+```{r}
+ggplot(df, aes(x = as.factor(target), fill = as.factor(target))) + 
+  geom_bar() + 
+  labs(title = "Count of Target Variable (Heart Disease)", x = "Target Variable (Heart Disease)",
+       y="Count", fill="Target Variable") + 
+  scale_fill_manual(values= c("0" = "blue", "1"= "red"), labels= c("No Disease", "Disease"))
+  #scale_fill_discrete(labels = c("No Disease", "Disease"))
+```
+
+
+
+
+
+
+
+```{r}
+ggplot(df, aes(x=factor(sex), fill= factor(target))) +
+geom_bar()+
+labs(title="Distribution of Gender by Heart Disease", x="Gender(0=Female, 1=Male)", y="Frequency")+
+scale_fill_manual(values= c("0" = "blue", "1"= "red"), labels= c("No Disease", "Disease"))
+```
+
+
+
+
+
+
+```{r}
+ggplot(df, aes(x=factor(cp), fill= factor(target))) +
+geom_bar()+
+labs(title="Distribution of Chest Pain by Heart Disease", x="Chest Pain", y="Frequency", fill='Target Variable') +
+scale_fill_manual(values= c("0" = "blue", "1"= "red"), labels= c("No Disease", "Disease"))
+```
+
+
+## Detecting Outliers
+
+
+
+
+```{r}
+# Handle Outliers
+# Define a function for capping outliers using the 1st and 99th percentiles
+cap_outliers <- function(x) {
+  lower_bound <- quantile(x, 0.01, na.rm = TRUE)
+  upper_bound <- quantile(x, 0.99, na.rm = TRUE)
+  x <- ifelse(x < lower_bound, lower_bound, x)
+  x <- ifelse(x > upper_bound, upper_bound, x)
+  return(x)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+df_ins_prep <- df %>%
+  mutate(across(all_of(names(df)), cap_outliers))
+
+describeBy(df_ins_prep)
+```
+
+
+
+```{r}
+df_ins_prep
+```
+
+
+
+## Transforming Variables
+
+
+
+
+```{r}
+#df_log %>% df
+```
+
+
+
+
+
 

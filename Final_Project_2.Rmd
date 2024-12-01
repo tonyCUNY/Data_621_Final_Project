@@ -85,7 +85,7 @@ summary(mydata.clean)
 ```{r, echo=FALSE}
 num_vars <- mydata.clean %>% select_if(where(is.numeric))
 vis_miss(num_vars, cluster = TRUE) + 
-  ggtitle("Numeric Variables \n- Most Missing Values (INCOME, HOME_VAL, AGE, YOJ, CAR_AGE)") +
+  ggtitle("Numeric Variables \n- Most Missing Values") +
   theme(
     plot.title = element_text(face = "bold"),
     plot.margin = unit(c(1, 2, 1, 1), "cm")
@@ -97,7 +97,7 @@ cat_vars <- mydata.clean %>% select_if(~ is.factor(.))
 cat_vars <- cat_vars %>% 
   mutate(across(everything(), ~na_if(as.character(.), "")))
 vis_miss(cat_vars, cluster = TRUE) +
-  ggtitle("Categorical Variables \n- Most Missing Values (JOB)") +
+  ggtitle("Categorical Variables \n- Most Missing Values") +
   theme(
     plot.title = element_text(face = "bold"),
     plot.margin = unit(c(1, 2, 1, 1), "cm")
@@ -152,7 +152,7 @@ ggplot(cor_long, aes(Var2, Var1, fill = value)) +
 
 the VIF score analysis is conducted to check for any multicollinearity.
 
-```{r vif_model, warning=FALSE, message=FALSE}
+```{r}
 # fit a linear regression before VIF score
 vif_model_all <- lm(as.numeric(target) ~ ., data = mydata.clean)
 
@@ -168,7 +168,7 @@ fbs1
 slope1
 restecg2
 
-```{r vif_score, warning=FALSE, message=FALSE}
+```{r}
 # perform VIF
 vif_value = vif(vif_model_all)
 vif_value
@@ -288,7 +288,7 @@ set.seed(1234)
 rf <- randomForest(target ~ ., data=train, proximity=TRUE, importance =TRUE, do.trace = 10, ntree = 50)
 rf
 ```
-1. Error rate become relatively flat after 10 trees
+1. Error rate become relatively flat after 5 trees
 
 ```{r}
 # Plot the error rate to see what is the suitable number of trees.
@@ -305,7 +305,7 @@ ggplot(data=oob.error.data, aes(x=Trees, y=Error)) +
 
 ```
 
-1. Here we select 10 as number of tree
+1. Here we select 5 as number of tree
 2. OOB is around 5% means 95% samples were correctly classified by the random forest
 
 ```{r}
@@ -350,3 +350,17 @@ plot.roc(train$target, rf3$votes[,1], percent=TRUE, col="#FA8072", print.auc=TRU
 legend("bottomright", legend=c("Logistic Regression", "Random Forest"), col=c("#0ABAB5","#FA8072"), lwd=2)
 ```
 
+```{r}
+# Assess model using Cross Validation
+
+crossValSettings2 <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE)
+
+crossVal2 <- train(target ~ age + sex + cp + trestbps + chol + thalach + 
+    exang + oldpeak + slope + ca + thal, data=mydata.clean, method = "rf", trControl = crossValSettings2, tuneLength = 5)
+
+crossVal2 
+
+pred2 <- predict(crossVal2, newdata = mydata.clean)
+confusionMatrix(data = pred, mydata.clean$target)
+
+```

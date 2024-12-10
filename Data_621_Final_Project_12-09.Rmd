@@ -88,12 +88,14 @@ We prioritized prediction accuracy by using the Akaike Information Criterion (AI
 One of the strengths of logistic regression is its interpretability. We calculated the coefficients and marginal effects to understand the impact of independent variables on the likelihood of heart disease. However, coefficients in logistic regression are scaled by a factor, so their magnitude does not directly indicate the size of their effect. Instead, they help identify which variables are more likely to influence heart disease risk. For example:
 
 Male individuals, higher cholesterol levels, exercise-induced angina, higher old peak values, and specific levels of chest pain type or major vessel coloring significantly increased the likelihood of heart disease.
+
 Marginal Effects provide a more intuitive interpretation by quantifying the change in the probability of the target outcome for a one-unit change in the predictor, holding all other variables constant. Examples include:
 
 Males: 17.27% more likely to have heart disease.
 Each unit increase in resting blood pressure: 0.225% more likely.
 Chest pain type 1: 10% more likely.
 Chest pain types 2 and 3: 19.58% and 21.21% less likely, respectively.
+
 We also assessed model fit using McFadden's Pseudo R-squared, which measures how well the model explains the data relative to a null model. Our logistic regression model achieved a McFadden's R-squared of 0.5745, a strong result indicating that the model explains approximately 57.45% of the variation in the outcome variable. Typically, values between 0.2 and 0.4 are considered acceptable, making this an exceptionally good fit.
 
 
@@ -105,12 +107,17 @@ The Random Forest model was implemented as a classification model, given the cat
 
 
 Model Comparison and Evaluation
-To compare the two models' predictive performance, we:
+Logistic Regression is a generalized linear model designed for binary classification. It predicts probabilities rather than continuous values, and its fit is evaluated using metrics such as McFadden’s Pseudo R-squared, which is based on likelihood ratios rather than explained variance.
 
-1. Generated confusion matrices to evaluate classification accuracy.
-2. Used ROC curves and AUC as key metrics. The ROC curve closer to the top-left corner and the higher AUC score indicate better performance.
+Random Forest, on the other hand, is a non-linear ensemble method used for classification (or regression). It does not provide an equivalent measure to R-squared for explaining variance in the same way linear models do. Instead, Random Forest focuses on reducing classification error rates and out-of-bag (OOB) error, which are unrelated to variance-based metrics like R-squared. McFadden’s Pseudo R-squared, used in Logistic Regression, is also not equivalent to traditional R-squared and cannot be directly compared with Random Forest's performance measures.
 
-The Random Forest model outperformed the Logistic Regression model in both ROC and AUC metrics, demonstrating superior ability to distinguish between classes. While logistic regression provided valuable interpretive insights into the effects of individual predictors, the Random Forest model achieved better overall predictive accuracy, making it the preferred model for this problem.
+For classification tasks like this, performance metrics such as ROC-AUC and confusion matrix-derived measures are more relevant for comparing models like Logistic Regression and Random Forest. These metrics assess how well the models predict outcomes, rather than how much variance is explained.
+
+To evaluate the two models' predictive performance, we:
+
+1. Generated confusion matrices to assess classification accuracy.
+2. Used ROC curves and AUC scores as key metrics, where a curve closer to the top-left corner and a higher AUC score indicate better performance.
+The Random Forest model outperformed the Logistic Regression model in both ROC and AUC metrics, demonstrating a superior ability to distinguish between classes. While Logistic Regression provided valuable interpretive insights into the effects of individual predictors, the Random Forest model achieved better overall predictive accuracy, making it the preferred model for this problem.
 
 
 ## Discussion and Conclusions: 
